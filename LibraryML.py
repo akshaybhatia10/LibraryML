@@ -4,7 +4,7 @@ class Node(object):
 	"""
 	Base Class NODE
 	"""
-	def __init__(self, inbound_nodes):
+	def __init__(self, inbound_nodes=[]):
 		## Inbound nodes to 'this' node 
 		self.inbound_nodes = inbound_nodes
 		## Outbound nodes from 'this' node
@@ -20,25 +20,21 @@ class Node(object):
 			node.outbound_nodes.append(self)
 
 	# These will be implemented in a subclass.
-    def forward(self):
-        """
-        Forward propagation.
-        
-        Compute the output value based on `inbound_nodes` and
-        store the result in self.value.
-        """
-        raise NotImplemented
 
-    def backward(self):
-        """
-        Backward propagation.
+    # def forward(self):
+    #     """
+    #     Forward propagation.
+    #     """
+    #     raise NotImplemented
+
+    # def backward(self):
+    #     """
+    #     Backward propagation.
         
-        Compute the gradient of the current node with respect
-        to the input nodes. The gradient of the loss with respect
-        to the current node should already be computed in the `gradients`
-        attribute of the output nodes.
-        """
-        raise NotImplemented		
+    #     Compute the gradient of the current node with respect
+    #     to the input nodes.
+    #     """
+    #     raise NotImplemented		
 
 
 class Input(Node):
@@ -52,7 +48,7 @@ class Input(Node):
 		Node.__init__(self)
 
 	def forward(self, value = None):
-		if value:
+		if value is not None:
 			self.value = value	
 
 
