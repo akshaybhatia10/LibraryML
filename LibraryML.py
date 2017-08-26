@@ -19,4 +19,17 @@ class Node(object):
 		for node in self.inbound_nodes:
 			node.outbound_nodes.append(self)
 
-	
+
+class Input(Node):
+	"""
+	 Input subclass just holds a value, such as a data 
+	 feature or a model parameter (weight/bias).
+	"""
+	def __init__(self):
+		## Input nodes or 'inputs' to the neural network will
+		## not have any inbound nodes
+		Node.__init__(self)
+
+	def forward(self, value = None):
+		if value:
+			self.value = value	
