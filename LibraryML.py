@@ -61,11 +61,32 @@ class Add(Node):
 
 	def forward(self, value = None):
 		self.value = 0
+
 		#x = self.inbound_nodes[0].value
 		#y = self.inbound_nodes[1].value
 		#self.value = x + y
+
+		#values = [n.value for n in self.inbound_nodes]
+		# self.value = sum(values)
+
 		for x in range(len(self.inbound_nodes)):
 			self.value += self.inbound_nodes[x].value
+
+class Mul(Node):
+	"""
+	MUL subclass of node performs a computation (Multiplication)
+	"""
+	def __init__(self, *inputs):
+		Node.__init__(self, inputs)
+
+	def forward(self, value = None):
+		self.value = 1
+
+		#for n in self.inbound_nodes:
+		#	self.value *= n.value
+
+		for x in range(len(self.inbound_nodes)):
+			self.value *= self.inbound_nodes[x].value				
 
 
 def topological_sort(feed_dict):
