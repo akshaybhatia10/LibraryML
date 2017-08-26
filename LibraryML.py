@@ -56,11 +56,16 @@ class Add(Node):
 	"""
 	ADD subclass of node performs a computation (Addition)
 	"""
-	def __init__(self, x, y):
-		Node.__init__(self, [x, y])
+	def __init__(self, *inputs):
+		Node.__init__(self, inputs)
 
 	def forward(self, value = None):
-		self.value = self.inbound_nodes[0].value + self.inbound_nodes[1].value
+		self.value = 0
+		#x = self.inbound_nodes[0].value
+		#y = self.inbound_nodes[1].value
+		#self.value = x + y
+		for x in range(len(self.inbound_nodes)):
+			self.value += self.inbound_nodes[x].value
 
 
 def topological_sort(feed_dict):
