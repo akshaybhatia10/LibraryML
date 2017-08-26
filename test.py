@@ -2,15 +2,15 @@ from LibraryML import *
 
 """
 For Testing Purposes only
-Builds and runs a graph with LibraryML.
+Builds and runs a differential graph with LibraryML.
 """
-x, y = Input(), Input()
+x, y, z = Input(), Input(), Input()
 
-f = Add(x, y)
+f = Add(x, y, z)
 
-feed_dict = {x: 10, y: 5}
+feed_dict = {x: 10, y: 5, z: 1}
 
 sorted_nodes = topological_sort(feed_dict)
 output = forward_pass(f, sorted_nodes)
 
-print("{} + {} = {} (according to miniflow)".format(feed_dict[x], feed_dict[y], output))
+print("{} + {} + {} = {} (according to miniflow)".format(feed_dict[x], feed_dict[y], feed_dict[z], output))
