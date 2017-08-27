@@ -104,8 +104,23 @@ class Linear(Node):
 		X = self.inbound_nodes[0].value
 		W = self.inbound_nodes[1].value	
 		b = self.inbound_nodes[2].value
-		self.value += np.dot(X,W)
-		self.value += b
+		self.value += np.dot(X,W) + b
+
+
+class Sigmoid(Node):
+	"""
+	SIGMOID subclass of node performs a computation (Sigmoid Function)
+	"""
+	def __init__(self, x):
+		Node.__init__(self, [x])
+
+	def _sigmoid(self, x):
+		z = 1.0 / (1.0 + np.exp(-x))
+		return z 	
+
+	def forward(self):
+		self.value = self._sigmoid(self.inbound_nodes[0].value)	
+
 
 def topological_sort(feed_dict):
     """
