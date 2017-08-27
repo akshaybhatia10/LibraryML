@@ -88,6 +88,7 @@ class Mul(Node):
 		for x in range(len(self.inbound_nodes)):
 			self.value *= self.inbound_nodes[x].value				
 
+
 class Linear(Node):
 	"""
 	LINEAR subclass of node performs a computation (Linear)
@@ -97,9 +98,14 @@ class Linear(Node):
 
 	def forward(self, value = None):
 		self.value = 0
-		for x in range(len(self.inbound_nodes)):
-			self.value += self.inbound_nodes[0].value[x] * self.inbound_nodes[1].value[x] 
-		self.value += self.inbound_nodes[2].value	
+		# for x in range(len(self.inbound_nodes)):
+		# 	self.value += self.inbound_nodes[0].value[x] * self.inbound_nodes[1].value[x] 
+		# self.value += self.inbound_nodes[2].value
+		X = self.inbound_nodes[0].value
+		W = self.inbound_nodes[1].value	
+		b = self.inbound_nodes[2].value
+		self.value += np.dot(X,W)
+		self.value += b
 
 def topological_sort(feed_dict):
     """
