@@ -88,6 +88,18 @@ class Mul(Node):
 		for x in range(len(self.inbound_nodes)):
 			self.value *= self.inbound_nodes[x].value				
 
+class Linear(Node):
+	"""
+	LINEAR subclass of node performs a computation (Linear)
+	"""
+	def __init__(self, inputs, weights, bias):
+		Node.__init__(self, [inputs, weights, bias])
+
+	def forward(self, value = None):
+		self.value = 0
+		for x in range(len(self.inbound_nodes)):
+			self.value += self.inbound_nodes[0].value[x] * self.inbound_nodes[1].value[x] 
+		self.value += self.inbound_nodes[2].value	
 
 def topological_sort(feed_dict):
     """
