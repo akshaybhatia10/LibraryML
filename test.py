@@ -16,6 +16,7 @@ f = Add(x, y, z)
 s = Mul(x, y, z)
 #l = Linear(inputs, weights, bias)
 l = Linear(X, W, b)
+g = Sigmoid(l)
 
 
 feed_dict1 = {x: 10, y: 5, z: 1}
@@ -37,6 +38,7 @@ sorted_nodes2 = topological_sort(feed_dict2)
 add = forward_pass(f, sorted_nodes1)
 mul = forward_pass(s, sorted_nodes1)
 lin = forward_pass(l, sorted_nodes2)
+sig = forward_pass(g, sorted_nodes2)
 
 
 print("{} + {} + {} = {} ".format(feed_dict1[x], feed_dict1[y], feed_dict1[z], add))
@@ -44,3 +46,7 @@ print("{} + {} + {} = {} ".format(feed_dict1[x], feed_dict1[y], feed_dict1[z], a
 print("{} * {} * {} = {} ".format(feed_dict1[x], feed_dict1[y], feed_dict1[z], mul))
 
 print("Linear Output: {}".format(lin))
+
+print("Sigmoid of Linear Operation: {}".format(sig))
+
+
