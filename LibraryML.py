@@ -136,6 +136,27 @@ class cost_mse(Node):
 		self.value = np.mean(error**2)
 			
 
+class cost_categorical_cross_entropy(Node):
+	"""
+	COST CROSS ENTROPY subclass node calulate softmax and loss (Categorical cross entropy)
+	"""
+	def __init__(self, y, y_hat):
+		Node.__init__(self, [y, y_hat])
+
+	def _softmax(self, x):
+		z = np.exp(x)/ np.sum(np.exp(x), axis=0, keepdims=True)
+		return z
+
+	def forward(self):
+		y = self.inbound_nodes[0].value
+		y_hat = self.inbound_nodes[1].value
+		m = y.shape[0]
+		print (y.shape)
+		logprobs = np.multiply(y, np.log(y_hat)) + np.multiply((1 - y), np.log(1 - y_hat))
+		self.value = - np.sum(logprobs) / m
+		self.value = np.squeeze(self.value)
+
+
 def topological_sort(feed_dict):
     """
     Sort generic nodes in topological order using Kahn's Algorithm.
