@@ -109,7 +109,7 @@ class Linear(Node):
 
 class Sigmoid(Node):
 	"""
-	SIGMOID subclass of node performs a computation (Sigmoid Function)
+	SIGMOID subclass of node performs a computation (Sigmoid Activation Function)
 	"""
 	def __init__(self, x):
 		Node.__init__(self, [x])
@@ -121,6 +121,20 @@ class Sigmoid(Node):
 	def forward(self):
 		self.value = self._sigmoid(self.inbound_nodes[0].value)	
 
+
+class cost_mse(Node):
+	"""
+	COST MSE subclass of node calculates the loss of the model (Mean Squared Error)
+	"""
+	def __init__(self, y, y_hat):
+		Node.__init__(self, [y, y_hat])
+
+	def forward(self):
+		y = self.inbound_nodes[0].value.reshape(-1, 1)
+		y_hat = self.inbound_nodes[1].value.reshape(-1, 1)
+		error = y - y_hat
+		self.value = np.mean(error**2)
+			
 
 def topological_sort(feed_dict):
     """
