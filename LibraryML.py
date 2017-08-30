@@ -100,8 +100,14 @@ class Mul(Node):
 		#	self.value *= n.value
 
 		for x in range(len(self.inbound_nodes)):
-			self.value *= self.inbound_nodes[x].value				
+			self.value *= self.inbound_nodes[x].value
 
+	def backward(self):
+		self.gradients = {n: 0 for n in self.inbound_nodes}
+		for n in self.outbound_nodes:
+			grad = n.gradients[self]
+			self.gradients[self.inbound_nodes[0]] = self.inbound_nodes[1].value 					
+			self.gradients[self.inbound_nodes[1]] = self.inbound_nodes[0].value
 
 class Linear(Node):
 	"""
