@@ -49,7 +49,13 @@ class Input(Node):
 
 	def forward(self, value = None):
 		if value is not None:
-			self.value = value	
+			self.value = value
+
+	def backward(self):
+		self.gradients = {self: 0}
+		for n in self.outbound_nodes:
+			grad_cost = n.gradients[self]
+			self.gradients[self] += n.gradients[self]			
 
 
 class Add(Node):
@@ -71,6 +77,8 @@ class Add(Node):
 
 		for x in range(len(self.inbound_nodes)):
 			self.value += self.inbound_nodes[x].value
+
+	def backward(self, value)		
 
 class Mul(Node):
 	"""
@@ -151,7 +159,6 @@ class cost_categorical_cross_entropy(Node):
 		y = self.inbound_nodes[0].value
 		y_hat = self.inbound_nodes[1].value
 		m = y.shape[0]
-		print (y.shape)
 		logprobs = np.multiply(y, np.log(y_hat)) + np.multiply((1 - y), np.log(1 - y_hat))
 		self.value = - np.sum(logprobs) / m
 		self.value = np.squeeze(self.value)
