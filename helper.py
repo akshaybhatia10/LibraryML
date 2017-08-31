@@ -56,4 +56,36 @@ def accuracy(node, feed_dict):
         else:
             n.forward()
 
-    return nodes[-1]._accuracy()    
+    return nodes[-1]._accuracy() 
+    
+
+def value_and_grad(node, feed_dict, wrt=[]):
+    """
+    Performs a forward and backward pass. The value of `node` after the forward pass will be returned along with the gradients of all nodes in `wrt`.
+    Arguments:
+        `node`: A node in the graph, should be the output node (have no outgoing edges.
+        `feed_dict`: A dictionary where the key is a `Input` node and the value is the respective value feed to that node.
+        `wrt`: A list of nodes. The gradient for each node will be returned.
+    """
+    assert node.outbound_nodes == []
+    input_nodes = [n for n in feed_dict.keys()]
+    nodes = topological_sort(input_nodes)
+
+    # forward pass
+    for n in nodes:
+        if n.typname == 'Input':
+            v = feed_dict[n]
+            n.forward(v)
+        else:
+            n.forward()
+
+    # backward pass
+    for n in nodes[::-1]:
+        if n.typname == 'DummyGrad':
+            g = feed_dict[n]
+            n.backward(g)
+        else:
+            n.backward()
+
+    return node.value, [n.gradients[n] for n in wrt]
+       
