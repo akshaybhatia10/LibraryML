@@ -1,4 +1,5 @@
 import numpy as np
+from helper import *
 
 class Node(object):
 	"""
@@ -172,7 +173,10 @@ class cost_mse(Node):
 		y_hat = self.inbound_nodes[1].value.reshape(-1, 1)
 		error = y - y_hat
 		self.value = np.mean(error**2)
-			
+	
+	def backward(self):
+        self.gradients[self.inbound_nodes[0]] = (2 / self.m) * self.diff
+        self.gradients[self.inbound_nodes[1]] = (-2 / self.m) * self.diff		
 
 class cost_categorical_cross_entropy(Node):
 	"""
@@ -181,9 +185,17 @@ class cost_categorical_cross_entropy(Node):
 	def __init__(self, y, y_hat):
 		Node.__init__(self, [y, y_hat])
 
+	def _predict(self):
+        probs = self._softmax(self.inbound_nodes[0].value)
+        return np.argmax(probs, axis=1)	
+
+	def _accuracy(self):
+        preds = self._predict()
+        return np.mean(preds == self.inbound_nodes[1].value)	
+
 	def _softmax(self, x):
 		z = np.exp(x)/ np.sum(np.exp(x), axis=0, keepdims=True)
-		return z
+		return z	
 
 	def forward(self):
 		y = self.inbound_nodes[0].value
@@ -205,46 +217,6 @@ class cost_categorical_cross_entropy(Node):
 		probs /=n
 		self.gradients[self.inbound_nodes[0]] = gprobs
 
-def topological_sort(feed_dict):
-    """
-    Sort generic nodes in topological order using Kahn's Algorithm.
-
-    `feed_dict`: A dictionary where the key is a `Input` node and the value is the respective value feed to that node.
-
-    Returns a list of sorted nodes.
-    """
-
-    input_nodes = [n for n in feed_dict.keys()]
-
-    G = {}
-    nodes = [n for n in input_nodes]
-    while len(nodes) > 0:
-        n = nodes.pop(0)
-        if n not in G:
-            G[n] = {'in': set(), 'out': set()}
-        for m in n.outbound_nodes:
-            if m not in G:
-                G[m] = {'in': set(), 'out': set()}
-            G[n]['out'].add(m)
-            G[m]['in'].add(n)
-            nodes.append(m)
-
-    L = []
-    S = set(input_nodes)
-    while len(S) > 0:
-        n = S.pop()
-
-        if isinstance(n, Input):
-            n.value = feed_dict[n]
-
-        L.append(n)
-        for m in n.outbound_nodes:
-            G[n]['out'].remove(m)
-            G[m]['in'].remove(n)
-            # if no other incoming edges add to S
-            if len(G[m]['in']) == 0:
-                S.add(m)
-    return L
 
 
 def forward_pass(output_node, sorted_nodes):
