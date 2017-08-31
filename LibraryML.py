@@ -124,7 +124,7 @@ class Linear(Node):
 		# for x in range(len(self.inbound_nodes)):
 		# 	self.value += self.inbound_nodes[0].value[x] * self.inbound_nodes[1].value[x] 
 		# self.value += self.inbound_nodes[2].value
-		
+
 		self.cache[0] = self.inbound_nodes[0].value  ## X (inputs)
 		self.cache[1] = self.inbound_nodes[1].value	 ## W (Weights)
 		self.cache[2] = self.inbound_nodes[2].value  ## b (bias)
@@ -152,6 +152,12 @@ class Sigmoid(Node):
 
 	def forward(self):
 		self.value = self._sigmoid(self.inbound_nodes[0].value)	
+
+	def backward(self):
+		self.gradients = {n: np.zeros_likes(n.value) for n in self.inbound_nodes}	
+		for n in self.outbound_nodes:
+			grad = n.gradients[self]
+			self.gradients[self.inbound_nodes[0]] += (1 - self.value) * self.value * grad
 
 
 class cost_mse(Node):
@@ -182,11 +188,22 @@ class cost_categorical_cross_entropy(Node):
 	def forward(self):
 		y = self.inbound_nodes[0].value
 		y_hat = self.inbound_nodes[1].value
+		self.cache[0] = self._softmax(self.inbound_nodes[0].value)
+		self.cache[1] = y_hat
 		m = y.shape[0]
 		logprobs = np.multiply(y, np.log(y_hat)) + np.multiply((1 - y), np.log(1 - y_hat))
 		self.value = - np.sum(logprobs) / m
 		self.value = np.squeeze(self.value)
 
+	def backward(self):
+		assert len(self.outbound_nodes) == 0
+		self.gradients = {n: np.zeros_like(n.value) for n in self.inbound_nodes}
+		probs = np.copy(self.cache[0])
+		y = self.cache[1]
+		n = probs.shape[0]
+		probs[range(n), y] -= 1
+		probs /=n
+		self.gradients[self.inbound_nodes[0]] = gprobs
 
 def topological_sort(feed_dict):
     """
