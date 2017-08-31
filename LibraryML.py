@@ -82,8 +82,8 @@ class Add(Node):
 		self.gradients = {n: 0 for n in self.inbound_nodes}
 		for n in self.outbound_nodes:
 			grad = n.gradients[self]
-			self.gradients[self.inbound_nodes[0]] += 1 * grad
-			self.gradients[self.inbound_nodes[1]] += 1 * grad
+			self.gradients[self.inbound_nodes[0]] += 1 * grad  ## dX
+			self.gradients[self.inbound_nodes[1]] += 1 * grad  ## dY
 
 
 class Mul(Node):
@@ -103,13 +103,14 @@ class Mul(Node):
 			self.value *= self.inbound_nodes[x].value
 
 	def backward(self):
-		self.cache[0] = self.inbound_nodes[0].value
-		self.cache[1] = self.inbound_nodes[1].value
+		self.cache[0] = self.inbound_nodes[0].value  ## X
+		self.cache[1] = self.inbound_nodes[1].value  ## Y
+
 		self.gradients = {n: 0 for n in self.inbound_nodes}
 		for n in self.outbound_nodes:
 			grad = n.gradients[self]
-			self.gradients[self.inbound_nodes[0]] = self.cache[1] * grad					
-			self.gradients[self.inbound_nodes[1]] = self.cache[0] * grad
+			self.gradients[self.inbound_nodes[0]] = self.cache[1] * grad  ## dX					
+			self.gradients[self.inbound_nodes[1]] = self.cache[0] * grad  ## dY
 
 class Linear(Node):
 	"""
@@ -123,16 +124,19 @@ class Linear(Node):
 		# for x in range(len(self.inbound_nodes)):
 		# 	self.value += self.inbound_nodes[0].value[x] * self.inbound_nodes[1].value[x] 
 		# self.value += self.inbound_nodes[2].value
-		X = self.inbound_nodes[0].value
-		W = self.inbound_nodes[1].value	
-		b = self.inbound_nodes[2].value
-		self.value += np.dot(X,W) + b
+		
+		self.cache[0] = self.inbound_nodes[0].value  ## X (inputs)
+		self.cache[1] = self.inbound_nodes[1].value	 ## W (Weights)
+		self.cache[2] = self.inbound_nodes[2].value  ## b (bias)
+		self.value += np.dot(self.cache[0], self.cache[1]) + self.cache[2]
 
 	def backward(self):
-		self.gradients = {n: 0 for n in self.inbound_nodes}
+		self.gradients = {n: np.zeros_likes(n.value) for n in self.inbound_nodes}
 		for n in self.outbound_nodes:
 			grad = n.gradients[self]
-			self.gradients[self.inbound_nodes[0]] = np.dot	
+			self.gradients[self.inbound_nodes[0]] += np.dot(grad, self.cache[1].T)	## dZ
+			self.gradients[self.inbound_nodes[1]] += np.dot(self.cache[0].T, grad)  ## dw
+			self.gradients[self.inbound_nodes[2]] += np.sum(grad, axis=0, keepdims=False)  ##db
 
 
 class Sigmoid(Node):
