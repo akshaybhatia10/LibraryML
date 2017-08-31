@@ -1,4 +1,5 @@
 from LibraryML import *
+from helper import *
 
 """
 For Testing Purposes only
@@ -65,10 +66,3 @@ print("Sigmoid of Linear Operation: {}".format(sig))
 print("Cost: {}".format(cost))
 
 print("Cost: {}".format(cross))
-
-# y = self.inbound_nodes[0].value.reshape(-1, 1)
-		# y_hat = self.inbound_nodes[1].value.reshape(-1, 1)
-		# m = self.inbound_nodes[0].value.shape[0]
-		# probs = (y * np.log(y_hat)) + ((1 - y) * np.log(1 - y_hat))
-		# self.value = - np.sum(probs) / m
-
