@@ -103,11 +103,13 @@ class Mul(Node):
 			self.value *= self.inbound_nodes[x].value
 
 	def backward(self):
+		self.cache[0] = self.inbound_nodes[0].value
+		self.cache[1] = self.inbound_nodes[1].value
 		self.gradients = {n: 0 for n in self.inbound_nodes}
 		for n in self.outbound_nodes:
 			grad = n.gradients[self]
-			self.gradients[self.inbound_nodes[0]] = self.inbound_nodes[1].value 					
-			self.gradients[self.inbound_nodes[1]] = self.inbound_nodes[0].value
+			self.gradients[self.inbound_nodes[0]] = self.cache[1] * grad					
+			self.gradients[self.inbound_nodes[1]] = self.cache[0] * grad
 
 class Linear(Node):
 	"""
@@ -125,6 +127,12 @@ class Linear(Node):
 		W = self.inbound_nodes[1].value	
 		b = self.inbound_nodes[2].value
 		self.value += np.dot(X,W) + b
+
+	def backward(self):
+		self.gradients = {n: 0 for n in self.inbound_nodes}
+		for n in self.outbound_nodes:
+			grad = n.gradients[self]
+			self.gradients[self.inbound_nodes[0]] = np.dot	
 
 
 class Sigmoid(Node):
